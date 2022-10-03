@@ -33,7 +33,7 @@ void Analyzer::processFile(){
     fclose(f);
 }
 
-void Analyzer::analyzeSymbol(const char* currentSymbol){
+void Analyzer::analyzeSymbol(const char* currentSymbol){  //todo different for BYTE and UTF-8
 
     bool found = false;
     for(auto & symbol : symbols){
@@ -51,7 +51,7 @@ void Analyzer::analyzeSymbol(const char* currentSymbol){
 }
 
 void Analyzer::makeReportFile() {
-    int symbolsInAlphabet = AlphabetMap.find(alphabet)->second.second;
+    int symbolsInAlphabet = AlphabetMap.find(alphabet)->second.second; //todo fix alphabet type
     double informationInFile = 0, informationPerSymbol;
 
     ofstream reportFile(info_file);
