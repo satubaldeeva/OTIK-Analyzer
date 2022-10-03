@@ -9,6 +9,8 @@
 #include <string>
 #include <iostream>
 #include <Algorithm>
+#include <iomanip>
+#include <cmath>
 
 #include "functions.h"
 
@@ -30,8 +32,20 @@ public:
     void makeReportFile();
 
     //comparators to sort symbols array
-    bool compareNames(const pair<string, int>& a, const pair<string, int>& b);
-    bool compareAmount(const pair<string, int>& a, const pair<string, int>& b);
+    struct namesDescending
+    {
+        inline bool operator() (const pair<string, int>& a, const pair<string, int>& b) {
+            return (a.first < b.first);
+        }
+    };
+
+    struct amountDescending
+    {
+        inline bool operator() (const pair<std::string, int> &a, const pair<std::string, int> &b) {
+            return (a.second < b.second);
+        }
+    };
+    
 };
 
 

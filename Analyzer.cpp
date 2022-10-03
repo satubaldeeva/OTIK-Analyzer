@@ -24,7 +24,7 @@ void Analyzer::processFile(){
 
         while (fread(symbol, symbol_size, 1, f) == symbol_size){
             analyzeSymbol(symbol);
-            file_size+=symbol_size;
+            file_size+=1;
         }
 
 
@@ -45,23 +45,45 @@ void Analyzer::analyzeSymbol(const char* currentSymbol){
 
 void Analyzer::makeReportFile() {
     int symbolsInAlphabet = AlphabetMap.find(alphabet)->second.second;
+    double informationInFile = 0, informationPerSymbol;
 
     ofstream reportFile(info_file);
     if(!reportFile)
         cout << "Can't open file " << file << endl;
     else {
-        sort(symbols.begin(), symbols.end(), compareNames())
+        reportFile << "FILE: " << file << endl;
+        reportFile << "Alphabet: " << to_string(alphabet) << endl;
+        reportFile << "Size (in symbols): " << file_size << endl;
+        reportFile << "----------------------------------------"<< endl;
+        reportFile << left<< setw(10) << "Symbol" << setw(6) << "Amount" << setw(8) << "Prob" << setw(6) <<"Inform" << endl;
+
+        sort(symbols.begin(), symbols.end(), namesDescending());
+
+        //write for each symbol
+        for(auto & symbol : symbols){
+            informationPerSymbol = log2(symbolsInAlphabet);
+            reportFile << left<< setw(10) << symbol.first << setw(6) << symbol.second << setw(8)
+            << 1/symbolsInAlphabet << setw(6) << informationPerSymbol << endl;  //todo check formulas
+        }
+        reportFile << "-----------------------------------------------------------------"<< endl;
+
+        sort(symbols.begin(), symbols.end(), amountDescending());
+
+        //write for each symbol
+        for(auto & symbol : symbols){
+            informationPerSymbol = log2(symbolsInAlphabet);
+            informationInFile += informationPerSymbol;
+            reportFile << left<< setw(10) << symbol.first << setw(6) << symbol.second << setw(8)
+                       << 1/symbolsInAlphabet << setw(6) << log2(symbolsInAlphabet) << endl;  //todo check formulas
+        }
+        reportFile << "-----------------------------------------------------------------"<< endl;
+        reportFile << "Amount of information: " << informationInFile << "bytes (" << informationInFile*8 << " bits)"
+        << endl << endl;
+
     }
 
 
 }
 
 
-bool Analyzer::compareNames(const pair<string, int>& a, const pair<string, int>& b) {
-    return (a.first < b.first);
-}
-
-bool Analyzer::compareAmount(const pair<std::string, int> &a, const pair<std::string, int> &b) {
-    return (a.second < b.second);
-}
 
