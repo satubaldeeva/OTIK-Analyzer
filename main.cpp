@@ -11,14 +11,18 @@ int main(int argv, char* argc[])
     cout<<endl<<"------------------------ ANALYZER ------------------------"<<endl<<endl;
     if(argv>1)
     {
-        auto* analyzer = new Analyzer(argc[2], getAlphabetFromString(argc[1]));
-        analyzer->processFile();
+        try{
+            auto* analyzer = new Analyzer(argc[2], getAlphabetFromString(argc[1]));
+            analyzer->processFile();
+            analyzer->makeReportFile();
+        }
+        catch (invalid_argument& e){
+            cout << "ERROR: " << e.what() << endl;
+        }
+
     }
     else {
-        cout << "USAGE:" << endl;
-        cout << "--type  <file to analyze>" << endl;
-        cout << "AVALIABLE TYPES:" << endl;
-        cout << "* byte\n* utf8" << endl;
+       printUsage();
     }
     cout<<endl<<"----------------------------------------------------------"<<endl<<endl;
 
