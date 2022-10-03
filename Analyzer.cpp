@@ -20,9 +20,10 @@ void Analyzer::processFile(){
     else {
         //reading symbols
         int symbol_size = AlphabetMap.find(alphabet)->second.first;
+
         char symbol[symbol_size];
 
-        while (fread(symbol, symbol_size, 1, f) == symbol_size){
+        while (fread(symbol, symbol_size, 1, f) == 1){
             analyzeSymbol(symbol);
             file_size+=1;
         }
@@ -33,14 +34,20 @@ void Analyzer::processFile(){
 }
 
 void Analyzer::analyzeSymbol(const char* currentSymbol){
+
+    bool found = false;
     for(auto & symbol : symbols){
-        if(!strcmp(currentSymbol, symbol.first.c_str())){
+        if(strcmp(currentSymbol, symbol.first.c_str()) == 0){
             //symbol is in the list, so increasing the amount
             symbol.second++;
+            found = true;
         }
     }
-    //symbol was not found in the list, adding it
-    symbols.emplace_back(make_pair(currentSymbol, 1));
+    if(!found) {
+        //symbol was not found in the list, adding it
+        symbols.emplace_back(make_pair(currentSymbol, 1));
+    }
+
 }
 
 void Analyzer::makeReportFile() {
@@ -62,8 +69,8 @@ void Analyzer::makeReportFile() {
         //write for each symbol
         for(auto & symbol : symbols){
             informationPerSymbol = log2(symbolsInAlphabet);
-            reportFile << left<< setw(10) << symbol.first << setw(6) << symbol.second << setw(8)
-            << 1/symbolsInAlphabet << setw(6) << informationPerSymbol << endl;  //todo check formulas
+            reportFile << left<< setw(10) << symbol.first << setw(10) << symbol.second << setw(10)
+            << 1/symbolsInAlphabet << setw(10) << informationPerSymbol << endl;  //todo check formulas
         }
         reportFile << "-----------------------------------------------------------------"<< endl;
 
@@ -73,8 +80,8 @@ void Analyzer::makeReportFile() {
         for(auto & symbol : symbols){
             informationPerSymbol = log2(symbolsInAlphabet);
             informationInFile += informationPerSymbol;
-            reportFile << left<< setw(10) << symbol.first << setw(6) << symbol.second << setw(8)
-                       << 1/symbolsInAlphabet << setw(6) << log2(symbolsInAlphabet) << endl;  //todo check formulas
+            reportFile << left<< setw(10) << symbol.first << setw(10) << symbol.second << setw(10)
+                       << 1/symbolsInAlphabet << setw(10) << log2(symbolsInAlphabet) << endl;  //todo check formulas
         }
         reportFile << "-----------------------------------------------------------------"<< endl;
         reportFile << "Amount of information: " << informationInFile << "bytes (" << informationInFile*8 << " bits)"
