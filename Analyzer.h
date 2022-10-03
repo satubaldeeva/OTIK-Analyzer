@@ -16,19 +16,20 @@ using namespace std;
 
 class Analyzer {
 private:
-    vector<pair<vector<char>, int>> symbols;
+    vector<pair<string, int>> symbols;
     string file;
+    int symbol_size;
     string info_file; //todo ?
 
 public:
 
     Analyzer(const string& file, Alphabet alphabet_type);
     void processFile();
+    void analyzeSymbol(const char*);
 
-    static bool testSymbol(const vector<char>&){
-       //todo  testSymbol function
-        return true;
-    }
+    //comparators to sort symbols array
+    bool compareNames(const pair<string, int>& a, const pair<string, int>& b);
+    bool compareAmount(const pair<string, int>& a, const pair<string, int>& b);
 };
 
 

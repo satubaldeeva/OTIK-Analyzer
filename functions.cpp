@@ -9,5 +9,7 @@ string getFileName(const string& filename) {
 }
 
 Alphabet getAlphabetFromString(char* str){
-    //todo  getAlphabetFromString function
+    if(strcmp(str,"--byte")==0) {return BYTE; }
+    if(strcmp(str,"--utf8")==0) {return UTF8; }
+    //scalable
 }
