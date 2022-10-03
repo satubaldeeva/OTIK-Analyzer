@@ -6,9 +6,9 @@
 #define OTIK_ANALYZER_ANALYZER_H
 
 #include <vector>
-#include <utility>
 #include <string>
 #include <iostream>
+#include <Algorithm>
 
 #include "functions.h"
 
@@ -18,14 +18,16 @@ class Analyzer {
 private:
     vector<pair<string, int>> symbols;
     string file;
-    int symbol_size;
+    Alphabet alphabet;
     string info_file; //todo ?
+    int file_size;
 
 public:
 
     Analyzer(const string& file, Alphabet alphabet_type);
     void processFile();
     void analyzeSymbol(const char*);
+    void makeReportFile();
 
     //comparators to sort symbols array
     bool compareNames(const pair<string, int>& a, const pair<string, int>& b);

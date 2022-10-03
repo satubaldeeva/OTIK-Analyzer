@@ -5,9 +5,15 @@
 #ifndef OTIK_ANALYZER_ALPHABET_H
 #define OTIK_ANALYZER_ALPHABET_H
 
+#include <map>
+#include <utility>
+
 enum Alphabet{
-    BYTE = 1,
-    UTF8 = 4 //todo 8?
+    BYTE,
+    UTF8
 };
+
+const std::map<Alphabet, std::pair<int, int>> AlphabetMap = {{BYTE, {1, 256}},
+                                                             {UTF8, {4, 1112064}}};
 
 #endif //OTIK_ANALYZER_ALPHABET_H
