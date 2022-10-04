@@ -15,41 +15,39 @@ Analyzer::Analyzer(const std::string &file, Alphabet alphabet_type) {
 void Analyzer::processFile(){
 
    ifstream f;
-   wifstream wf;
+   string str;
 
-    switch (alphabet) {
-        case BYTE:
-
-            f.open(file);
-            if(!f)
-                cout << "Can't read file " << file << endl;
-            else {
+    f.open(file);
+    if(!f)
+        cout << "Can't read file " << file << endl;
+    else {
+        switch (alphabet) {
+            case BYTE:
                 //reading symbols
                 char byte[1];
                 while (f.read(byte, 1)){
                     analyzeByte(byte);
                     file_size+=1;
                 };
-            }
-            f.close();
-            break;
+              f.close();
+                break;
 
-        case UTF8:
-            wf.open(file, ios_base::in);
-            if(!wf)
-                cout << "Can't read file " << file << endl;
-            else {
-                wchar_t sym;
-                while (wf.get(sym)) {
-                    analyzeUTF8(sym);
-                    file_size += 1;
+            case UTF8:
+                while (getline(f, str)) {
+                    vector<string> syms = divideString(str);
+                    for(int i = 0; i < syms.size(); i++){
+                        analyzeUTF8(syms[i]);
+                        file_size += 1;
+                    }
                 };
-            }
-            wf.close();
+                f.close();
 
-        default:
-            break;
+            default:
+                break;
+        }
     }
+
+
 
 }
 
@@ -60,7 +58,7 @@ void Analyzer::analyzeByte(const char* currentByte){  //todo different for BYTE 
 
     bool found = false;
     for(auto & symbol : symbols){
-        if(strcmp(writeBuff, narrow(symbol.first).c_str()) == 0){
+        if(strcmp(writeBuff, symbol.first.c_str()) == 0){
             //symbol is in the list, so increasing the amount
             symbol.second++;
             found = true;
@@ -68,15 +66,15 @@ void Analyzer::analyzeByte(const char* currentByte){  //todo different for BYTE 
     }
     if(!found) {
         //symbol was not found in the list, adding it
-        symbols.emplace_back(make_pair(widen(writeBuff), 1));
+        symbols.emplace_back(make_pair(writeBuff, 1));
     }
 
 }
 
-void Analyzer::analyzeUTF8(const wchar_t currentSymbol){
+void Analyzer::analyzeUTF8(const string& currentSymbol){
     bool found = false;
     for(auto & symbol : symbols){
-        if(symbol.first[0] == currentSymbol){
+        if(symbol.first == currentSymbol){
             //symbol is in the list, so increasing the amount
             symbol.second++;
             found = true;
@@ -84,7 +82,7 @@ void Analyzer::analyzeUTF8(const wchar_t currentSymbol){
     }
     if(!found) {
         //symbol was not found in the list, adding it
-        symbols.emplace_back(make_pair(wstring(1, currentSymbol), 1));
+        symbols.emplace_back(make_pair(currentSymbol, 1));
     }
 }
 
@@ -92,12 +90,12 @@ void Analyzer::makeReportFile() {
     int symbolsInAlphabet = AlphabetMap.find(alphabet)->second.first.second;
     double informationInFile = 0, informationPerSymbol;
 
-    wofstream reportFile(info_file, ios_base::out);
+    ofstream reportFile(info_file, ios_base::out);
     if(!reportFile)
         cout << "Can't open file " << info_file << endl;
     else {
-        reportFile << "FILE: " << widen(file) << endl;
-        reportFile << "Alphabet: " << widen(AlphabetMap.find(alphabet)->second.second) << endl;
+        reportFile << "FILE: " << file << endl;
+        reportFile << "Alphabet: " << AlphabetMap.find(alphabet)->second.second << endl;
         reportFile << "Size (in symbols): " << file_size << endl;
         reportFile << "----------------------------------------"<< endl;
         reportFile << setw(10) << "Symbol" << setw(10) << "Amount" << setw(20) << "Prob" << setw(10) <<"Inform" << endl;
