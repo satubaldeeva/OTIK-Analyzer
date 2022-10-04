@@ -5,13 +5,13 @@
 #ifndef OTIK_ANALYZER_ANALYZER_H
 #define OTIK_ANALYZER_ANALYZER_H
 
-#include <vector>
-#include <string>
-#include <Algorithm>
+#include <algorithm>
 #include <iomanip>
 #include <cmath>
 
 #include "functions.h"
+
+#define BUFF_SIZE 10
 
 using namespace std;
 
@@ -20,14 +20,15 @@ private:
     vector<pair<string, int>> symbols;
     string file;
     Alphabet alphabet;
-    string info_file; //todo ?
+    string info_file;
     int file_size;
 
 public:
 
     Analyzer(const string& file, Alphabet alphabet_type);
     void processFile();
-    void analyzeSymbol(const char*);
+    void analyzeByte(const char* currentByte);
+    void analyzeUTF8(const string& currentSymbol);
     void makeReportFile();
 
     //comparators to sort symbols array
@@ -41,7 +42,7 @@ public:
     struct amountDescending
     {
         inline bool operator() (const pair<std::string, int> &a, const pair<std::string, int> &b) {
-            return (a.second < b.second);
+            return (a.second > b.second);
         }
     };
     
