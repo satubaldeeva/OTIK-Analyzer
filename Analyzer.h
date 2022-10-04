@@ -29,7 +29,7 @@ public:
     Analyzer(const string& file, Alphabet alphabet_type);
     void processFile();
     void analyzeByte(const char* currentByte);
-    void analyzeUTF8(const char* currentSymbol);
+    void analyzeUTF8(const char currentSymbol);
     void makeReportFile();
 
     //comparators to sort symbols array
