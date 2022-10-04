@@ -18,7 +18,7 @@ using namespace std;
 
 class Analyzer {
 private:
-    vector<pair<string, int>> symbols;
+    vector<pair<wstring, int>> symbols;
     string file;
     Alphabet alphabet;
     string info_file;
@@ -29,20 +29,20 @@ public:
     Analyzer(const string& file, Alphabet alphabet_type);
     void processFile();
     void analyzeByte(const char* currentByte);
-    void analyzeUTF8(const char currentSymbol);
+    void analyzeUTF8(const wchar_t currentSymbol);
     void makeReportFile();
 
     //comparators to sort symbols array
     struct namesDescending
     {
-        inline bool operator() (const pair<string, int>& a, const pair<string, int>& b) {
+        inline bool operator() (const pair<wstring, int>& a, const pair<wstring, int>& b) {
             return (a.first < b.first);
         }
     };
 
     struct amountDescending
     {
-        inline bool operator() (const pair<std::string, int> &a, const pair<std::string, int> &b) {
+        inline bool operator() (const pair<std::wstring, int> &a, const pair<std::wstring, int> &b) {
             return (a.second > b.second);
         }
     };
