@@ -14,8 +14,8 @@ enum Alphabet{
     UTF8
 };
 
-const std::map<Alphabet, std::pair<std::pair<int, int>, std::string>> AlphabetMap =
-        {{BYTE, {{1, 256}, "BYTE"}},
-         {UTF8, {{4, 1112064}, "UTF8"}}};
+const std::map<Alphabet, std::string> alphabetNamingMap =
+        {{BYTE, "BYTE"},
+         {UTF8, "UTF8"}};
 
 #endif //OTIK_ANALYZER_ALPHABET_H

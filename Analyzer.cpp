@@ -87,15 +87,14 @@ void Analyzer::analyzeUTF8(const string& currentSymbol){
 }
 
 void Analyzer::makeReportFile() {
-    int symbolsInAlphabet = AlphabetMap.find(alphabet)->second.first.second;
-    double informationInFile = 0, informationPerSymbol;
+    double informationInFile = 0, informationPerSymbol, probability;
 
     ofstream reportFile(info_file, ios_base::out);
     if(!reportFile)
         cout << "Can't open file " << info_file << endl;
     else {
         reportFile << "FILE: " << file << endl;
-        reportFile << "Alphabet: " << AlphabetMap.find(alphabet)->second.second << endl;
+        reportFile << "Alphabet: " << alphabetNamingMap.find(alphabet)->second << endl;
         reportFile << "Size (in symbols): " << file_size << endl;
         reportFile << "----------------------------------------"<< endl;
         reportFile << setw(10) << "Symbol" << setw(10) << "Amount" << setw(20) << "Prob" << setw(10) <<"Inform" << endl;
@@ -104,9 +103,12 @@ void Analyzer::makeReportFile() {
 
         //write for each symbol
         for(auto & symbol : symbols){
-            informationPerSymbol = log2(symbolsInAlphabet);
+            probability = (double)symbol.second/file_size;
+            informationPerSymbol = -log2(probability);
             reportFile  << setw(10) << symbol.first << setw(10) << symbol.second << setw(20) <<
-            setprecision(10) << fixed << (double)1/symbolsInAlphabet << setw(10) << setprecision(1) << informationPerSymbol << endl;  //todo check formulas
+            setprecision(10) << fixed << probability << setw(10) << setprecision(1) << informationPerSymbol << endl;
+
+            informationInFile +=  symbol.second * informationPerSymbol;
         }
         reportFile << "-----------------------------------------------------------------"<< endl;
 
@@ -114,14 +116,14 @@ void Analyzer::makeReportFile() {
 
         //write for each symbol
         for(auto & symbol : symbols){
-            informationPerSymbol = log2(symbolsInAlphabet);
-            informationInFile += informationPerSymbol;
-            reportFile << setw(10) << symbol.first << setw(10) << symbol.second << setw(20)
-            <<setprecision(10) << fixed << (double)1/symbolsInAlphabet << setw(10) << setprecision(1) << informationPerSymbol << endl;  //todo check formulas
+            probability = (double)symbol.second/file_size;
+            informationPerSymbol = -log2(probability);
+            reportFile  << setw(10) << symbol.first << setw(10) << symbol.second << setw(20) <<
+                        setprecision(10) << fixed << probability << setw(10) << setprecision(1) << informationPerSymbol << endl;  //todo check formulas
         }
         reportFile << "-----------------------------------------------------------------"<< endl;
-        reportFile << "Amount of information: " << informationInFile << " bytes (" << fixed << setprecision(0)
-        << informationInFile*8 << " bits)"
+        reportFile << "Amount of information: " << informationInFile/8 << " bytes (" << fixed << setprecision(0)
+        << informationInFile << " bits)"
         << endl << endl;
 
     }
