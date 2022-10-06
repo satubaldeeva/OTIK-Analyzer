@@ -87,7 +87,6 @@ void Analyzer::analyzeUTF8(const string& currentSymbol){
 }
 
 void Analyzer::makeReportFile() {
-    int symbolsInAlphabet = AlphabetMap.find(alphabet)->second.first.second;
     double informationInFile = 0, informationPerSymbol, probability;
 
     ofstream reportFile(info_file, ios_base::out);
@@ -95,7 +94,7 @@ void Analyzer::makeReportFile() {
         cout << "Can't open file " << info_file << endl;
     else {
         reportFile << "FILE: " << file << endl;
-        reportFile << "Alphabet: " << AlphabetMap.find(alphabet)->second.second << endl;
+        reportFile << "Alphabet: " << alphabetNamingMap.find(alphabet)->second << endl;
         reportFile << "Size (in symbols): " << file_size << endl;
         reportFile << "----------------------------------------"<< endl;
         reportFile << setw(10) << "Symbol" << setw(10) << "Amount" << setw(20) << "Prob" << setw(10) <<"Inform" << endl;
