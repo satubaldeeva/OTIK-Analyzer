@@ -1,0 +1,3 @@
+C:/Users/NITRO 5/CLionProjects/OTIK-Analyzer/cmake-build-debug/CMakeFiles/Analyzer.dir
+C:/Users/NITRO 5/CLionProjects/OTIK-Analyzer/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/NITRO 5/CLionProjects/OTIK-Analyzer/cmake-build-debug/CMakeFiles/rebuild_cache.dir
