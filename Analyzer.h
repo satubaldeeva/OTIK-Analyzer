@@ -18,7 +18,10 @@ using namespace std;
 class Analyzer {
 private:
     vector<pair<string, int>> symbols;
+    vector<pair<string, int>> pair_symbols;
+    vector<pair<string, int>> pair_start_symbol;
     string file;
+
     Alphabet alphabet;
     string info_file;
     int file_size;
@@ -28,7 +31,11 @@ public:
     Analyzer(const string& file, Alphabet alphabet_type);
     void processFile();
     void analyzeByte(const char* currentByte);
+    void analyzeBytePair(const char* currentByte);
+    void analyzeByteAllPair();
     void analyzeUTF8(const string& currentSymbol);
+    void analyzeUTF8Pair(const string& currentSymbol);
+    void analyzeAllPair();
     void makeReportFile();
 
     //comparators to sort symbols array

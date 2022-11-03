@@ -1,9 +1,9 @@
 //
 // Created by Grigory on 02/10/2022.
 //
-
+#include "string.h"
 #include <fstream>
-#include "Analyzer.h"
+#include "Analyzer.h"/
 
 Analyzer::Analyzer(const std::string &file, Alphabet alphabet_type) {
     this->file = file;
@@ -16,6 +16,7 @@ void Analyzer::processFile(){
 
    ifstream f;
    string str;
+    vector<string> all_syms;
 
     f.open(file);
     if(!f)
@@ -27,19 +28,34 @@ void Analyzer::processFile(){
                 char byte[1];
                 while (f.read(byte, 1)){
                     analyzeByte(byte);
+                    all_syms.push_back(byte);
                     file_size+=1;
                 };
+                for(int i = 0; i < all_syms.size()-1; i++){//do pair symbols by index in vector
+                    basic_string<char> a = all_syms[i]+ all_syms[i+1];
+                    analyzeBytePair(a.c_str());
+                }
+                analyzeAllPair();
+
               f.close();
                 break;
 
             case UTF8:
+
                 while (getline(f, str)) {
                     vector<string> syms = divideString(str);
+                    all_syms.insert(all_syms.end(),syms.begin(),syms.end());
                     for(int i = 0; i < syms.size(); i++){
                         analyzeUTF8(syms[i]);
                         file_size += 1;
                     }
+
                 };
+                for(int i = 0; i < all_syms.size()-1; i++){//do pair symbols by index in vector
+                    basic_string<char> a =all_syms[i] + all_syms[i+1];
+                    analyzeUTF8Pair(a);
+                }
+                analyzeAllPair();
                 f.close();
 
             default:
@@ -71,6 +87,30 @@ void Analyzer::analyzeByte(const char* currentByte){  //todo different for BYTE 
 
 }
 
+
+void Analyzer::analyzeBytePair(const char* currentByte){  //todo different for BYTE and UTF-8
+
+    char writeBuff[BUFF_SIZE];
+    sprintf(&writeBuff[0], "%02X", currentByte[0]);
+    sprintf(&writeBuff[1], "%02X", currentByte[1]);
+    printf(writeBuff,currentByte,"\n");
+
+
+    bool found = false;
+    for(auto & symbol : pair_symbols){
+        if(strcmp(writeBuff, symbol.first.c_str()) == 0){
+            //symbol is in the list, so increasing the amount
+            symbol.second++;
+            found = true;
+        }
+    }
+    if(!found) {
+        //symbol was not found in the list, adding it
+        pair_symbols.emplace_back(make_pair(writeBuff, 1));
+    }
+
+}
+
 void Analyzer::analyzeUTF8(const string& currentSymbol){
     bool found = false;
     for(auto & symbol : symbols){
@@ -86,6 +126,39 @@ void Analyzer::analyzeUTF8(const string& currentSymbol){
     }
 }
 
+
+void Analyzer::analyzeUTF8Pair(const string& currentSymbol){
+    bool found = false;
+    for(auto & symbol : pair_symbols){
+        if(symbol.first == currentSymbol){
+            //symbol is in the list, so increasing the amount
+            symbol.second++;
+            found = true;
+        }
+    }
+    if(!found) {
+        //symbol was not found in the list, adding it
+        pair_symbols.emplace_back(make_pair(currentSymbol, 1));
+    }
+}
+
+void Analyzer::analyzeAllPair(){
+
+    for(auto & s:symbols) {//create a new vector to count all pairs with this symbol
+        pair_start_symbol.emplace_back(make_pair(s.first, 0));
+    }
+    for( auto &s:pair_start_symbol){//search pairs
+        for (auto &symbol: pair_symbols) {
+
+            if (*s.first.begin() == *symbol.first.begin()) {
+                //symbol is in the list, so increasing the amount
+                s.second++;
+            }
+        }
+    }
+
+}
+
 void Analyzer::makeReportFile() {
     double informationInFile = 0, informationPerSymbol, probability;
 
@@ -97,35 +170,44 @@ void Analyzer::makeReportFile() {
         reportFile << "Alphabet: " << alphabetNamingMap.find(alphabet)->second << endl;
         reportFile << "Size (in symbols): " << file_size << endl;
         reportFile << "----------------------------------------"<< endl;
-        reportFile << setw(10) << "Symbol" << setw(10) << "Amount" << setw(20) << "Prob" << setw(10) <<"Inform" << endl;
+        reportFile << setw(10) << "Symbol" << setw(10) << "Amount" << setw(30) << "Unconditional probability" << endl;
 
         sort(symbols.begin(), symbols.end(), namesDescending());
 
         //write for each symbol
         for(auto & symbol : symbols){
-            probability = (double)symbol.second/file_size;
-            informationPerSymbol = -log2(probability);
-            reportFile  << setw(10) << symbol.first << setw(10) << symbol.second << setw(20) <<
-            setprecision(10) << fixed << probability << setw(10) << setprecision(1) << informationPerSymbol << endl;
-
+            probability = (double)symbol.second/256;//безусловная вероятность
+            informationPerSymbol =(double)( -log2(probability));
+            reportFile  << setw(10) << symbol.first << setw(10) << symbol.second << setw(30) <<
+            setprecision(10) << fixed << probability << setw(10) << setprecision(1) << endl;
             informationInFile +=  symbol.second * informationPerSymbol;
         }
         reportFile << "-----------------------------------------------------------------"<< endl;
 
-        sort(symbols.begin(), symbols.end(), amountDescending());
-
-        //write for each symbol
-        for(auto & symbol : symbols){
-            probability = (double)symbol.second/file_size;
-            informationPerSymbol = -log2(probability);
-            reportFile  << setw(10) << symbol.first << setw(10) << symbol.second << setw(20) <<
-                        setprecision(10) << fixed << probability << setw(10) << setprecision(1) << informationPerSymbol << endl;  //todo check formulas
+        reportFile << setw(10) << "Symbol"<< setw(30) << "Conditional probability"<< endl;
+        for(auto & symbol : pair_start_symbol){
+            probability = (double)symbol.second/pair_symbols.size();//безусловная вероятность
+            informationPerSymbol =(double)(-log2(probability));
+            reportFile  << setw(10) << symbol.first << setw(30) <<fixed << setprecision(10)<< probability << endl;
+            informationInFile +=  symbol.second * informationPerSymbol;
         }
         reportFile << "-----------------------------------------------------------------"<< endl;
         reportFile << "Amount of information: " << informationInFile/8 << " bytes (" << fixed << setprecision(0)
         << informationInFile << " bits)"
         << endl << endl;
+        reportFile << "-----------------------------------------------------------------"<< endl;
+        reportFile << "Number of occurrences of substrings"  << endl << endl;
+        for(auto & symbol : pair_symbols){
 
+            reportFile  << setw(10) <<"("<< symbol.first<< ")" << setw(10) << symbol.second <<setw(20) <<endl;  //todo check formulas
+        }
+        reportFile << "-----------------------------------------------------------------"<< endl;
+        reportFile << "The common occurrence of any two-character substrings starting with the character"  << endl << endl;
+
+        for(auto & symbol : pair_start_symbol){
+
+            reportFile  << setw(10) << symbol.first << setw(10) << symbol.second <<setw(20) <<endl;  //todo check formulas
+        }
     }
     reportFile.close();
 
