@@ -16,7 +16,7 @@ void Analyzer::processFile(){
 
    ifstream f;
    string str;
-    vector<string> all_syms;
+   vector<string> all_syms;
 
     f.open(file);
     if(!f)
@@ -31,8 +31,19 @@ void Analyzer::processFile(){
                     all_syms.push_back(byte);
                     file_size+=1;
                 };
+
+                for(auto & symbol : all_syms){
+                    symbol=symbol[0];
+                }
+                cout<<"print:\n";
+                for(auto & symbol : all_syms){
+                    cout<<symbol;
+                }
+                cout<<"------------------------------------------------------\n";
                 for(int i = 0; i < all_syms.size()-1; i++){//do pair symbols by index in vector
-                    basic_string<char> a = all_syms[i]+ all_syms[i+1];
+                    string a = all_syms[i];
+                    a.append(all_syms[i+1]);
+                    cout<<a<<endl;//пары формируются верно
                     analyzeBytePair(a.c_str());
                 }
                 analyzeAllPair();
@@ -93,7 +104,7 @@ void Analyzer::analyzeBytePair(const char* currentByte){  //todo different for B
     char writeBuff[BUFF_SIZE];
     sprintf(&writeBuff[0], "%02X", currentByte[0]);
     sprintf(&writeBuff[1], "%02X", currentByte[1]);
-    printf(writeBuff,currentByte,"\n");
+   cout<<writeBuff<<" " <<currentByte[0]<<" "<<currentByte[1]<<"\n";
 
 
     bool found = false;
