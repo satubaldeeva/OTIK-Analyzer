@@ -46,7 +46,7 @@ void Analyzer::processFile(){
                     cout<<a<<endl;//пары формируются верно
                     analyzeBytePair(a.c_str());
                 }
-                analyzeAllPair();
+                analyzeAllPairByte();
 
               f.close();
                 break;
@@ -152,6 +152,21 @@ void Analyzer::analyzeUTF8Pair(const string& currentSymbol){
     }
 }
 
+void Analyzer::analyzeAllPairByte() {
+
+    for (auto &s: symbols) {//create a new vector to count all pairs with this symbol
+        pair_start_symbol.emplace_back(make_pair(s.first, 0));
+    }
+    for (auto &s: pair_start_symbol) {//search pairs
+        for (auto &symbol: pair_symbols) {
+
+            if (s.first[0] == symbol.first[0] || s.first[1] == symbol.first[1]) {
+                //symbol is in the list, so increasing the amount
+                s.second++;
+            }
+        }
+    }
+}
 void Analyzer::analyzeAllPair(){
 
     for(auto & s:symbols) {//create a new vector to count all pairs with this symbol
@@ -162,6 +177,8 @@ void Analyzer::analyzeAllPair(){
 
             if (*s.first.begin() == *symbol.first.begin()) {
                 //symbol is in the list, so increasing the amount
+                std::cout<<"symlol from table "<<symbol.first[0]<<symbol.first[2]<<endl;
+
                 s.second++;
             }
         }

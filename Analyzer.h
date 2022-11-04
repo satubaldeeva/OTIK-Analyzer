@@ -36,6 +36,7 @@ public:
     void analyzeUTF8(const string& currentSymbol);
     void analyzeUTF8Pair(const string& currentSymbol);
     void analyzeAllPair();
+    void analyzeAllPairByte();
     void makeReportFile();
 
     //comparators to sort symbols array
