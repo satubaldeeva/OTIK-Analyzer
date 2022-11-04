@@ -103,9 +103,8 @@ void Analyzer::analyzeBytePair(const char* currentByte){  //todo different for B
 
     char writeBuff[BUFF_SIZE];
     sprintf(&writeBuff[0], "%02X", currentByte[0]);
-    sprintf(&writeBuff[1], "%02X", currentByte[1]);
-   cout<<writeBuff<<" " <<currentByte[0]<<" "<<currentByte[1]<<"\n";
-
+    sprintf(&writeBuff[2], "%02X", currentByte[1]);
+    cout<<writeBuff<<" " <<currentByte[0]<<" "<<currentByte[1]<<"\n";
 
     bool found = false;
     for(auto & symbol : pair_symbols){
